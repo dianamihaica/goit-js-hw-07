@@ -1,66 +1,60 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const gallery = document.getElementById('gallery');
-    const navigateButton = document.getElementById('navigateButton');
-    let currentIndex = 0;
+  const galleryContainer = document.getElementById('gallery');
+  const prevButton = document.getElementById('prevButton');
+  const nextButton = document.getElementById('nextButton');
 
-    function renderGallery() {
-        galleryItems.forEach((item, index) => {
-            const listItem = document.createElement('li');
-            listItem.classList.add('gallery__item');
+  // Funcția pentru crearea și randarea unui element de galerie
+  function renderGalleryItem(item) {
+    const listItem = document.createElement('li');
+    listItem.classList.add('gallery__item');
 
-            const link = document.createElement('a');
-            link.classList.add('gallery__link');
-            link.href = item.source;
+    const link = document.createElement('a');
+    link.classList.add('gallery__link');
+    link.href = item.large;
 
-            const image = document.createElement('img');
-            image.classList.add('gallery__image');
-            image.src = item.thumbnail;
-            image.alt = item.description;
-            image.setAttribute('data-source', item.source);
+    const image = document.createElement('img');
+    image.classList.add('gallery__image');
+    image.src = item.small;
+    image.alt = item.alt;
 
-            link.addEventListener('click', (event) => openModal(event, index));
+    link.appendChild(image);
+    listItem.appendChild(link);
 
-            link.appendChild(image);
-            listItem.appendChild(link);
-            gallery.appendChild(listItem);
-        });
+    return listItem;
+  }
 
-        // Adăugați event listener pentru butonul de navigare
-        navigateButton.addEventListener('click', showNextImage);
-    }
+  // Funcția pentru inițializarea SimpleLightbox după ce galeria este randată
+  function initializeLightbox() {
+    const gallery = new SimpleLightbox('.gallery a', {
+      captions: true,
+      captionDelay: 250,
+      nav: false // Dezactivează butoanele de navigare implicită
+    });
 
-    function openModal(event, index) {
-        event.preventDefault();
-        currentIndex = index;
-        const sourceUrl = event.currentTarget.querySelector('.gallery__image').getAttribute('data-source');
-        showImage(sourceUrl);
-    }
+    // Adaugă evenimente pentru butoanele personalizate
+    prevButton.addEventListener('click', () => gallery.prev());
+    nextButton.addEventListener('click', () => gallery.next());
+  }
 
-    function showNextImage() {
-        currentIndex = (currentIndex + 1) % galleryItems.length;
-        const sourceUrl = galleryItems[currentIndex].source;
-        showImage(sourceUrl);
-    }
+  // Funcția pentru randarea galeriei
+  function renderGallery() {
+    const galleryItems = [
+      { small: 'small-image1.jpg', large: 'large-image1.jpg', alt: 'Image 1 description' },
+      { small: 'small-image2.jpg', large: 'large-image2.jpg', alt: 'Image 2 description' },
+      // ... adăugați mai multe elemente după această structură
+    ];
 
-    function showImage(sourceUrl) {
-        const instance = basicLightbox.create(`<img src="${sourceUrl}" alt="Image description">`);
-        instance.show();
+    const galleryFragment = document.createDocumentFragment();
+    galleryItems.forEach(item => galleryFragment.appendChild(renderGalleryItem(item)));
+    galleryContainer.appendChild(galleryFragment);
 
-        document.addEventListener('keydown', handleKeyPress);
-    }
+    // Inițializarea SimpleLightbox după ce galeria este randată
+    initializeLightbox();
+  }
 
-    function handleKeyPress(e) {
-        if (e.key === 'ArrowRight') {
-            showNextImage();
-        } else if (e.key === 'Escape') {
-            basicLightbox.close();
-            document.removeEventListener('keydown', handleKeyPress);
-        }
-    }
-
-    renderGallery();
+  // Rularea funcției pentru a genera galeria
+  renderGallery();
 });
-
 
 
 const galleryItems = [
